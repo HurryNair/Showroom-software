@@ -1,0 +1,203 @@
+CREATE TABLE dimension (
+  ID int(11) NOT NULL AUTO_INCREMENT,
+  Width varchar(30) DEFAULT NULL,
+  Height varchar(30) DEFAULT NULL,
+  DEPTH varchar(30) DEFAULT NULL,
+  CUT_OUT varchar(50) DEFAULT NULL,
+  Std_len varchar(30) DEFAULT NULL,
+  Mounting_Pipe_Diameter int(11) DEFAULT NULL,
+  PRIMARY KEY (ID)
+ );
+ 
+ CREATE TABLE holder_type (
+  ID int(11) NOT NULL AUTO_INCREMENT,
+  Name varchar(50) DEFAULT NULL,
+  PRIMARY KEY (ID)
+ );
+ 
+ CREATE TABLE warranty (
+  ID int(11) NOT NULL AUTO_INCREMENT,
+  Coverage varchar(50) DEFAULT NULL,
+  Terms_conditions varchar(10000) DEFAULT NULL,
+  PRIMARY KEY (ID)
+ );
+ 
+ CREATE TABLE fixture_type (
+  ID int(11) NOT NULL AUTO_INCREMENT,
+  Name varchar(50) DEFAULT NULL,
+  PRIMARY KEY (ID)
+ );
+ 
+ CREATE TABLE pricebook (
+  ID int(11) NOT NULL AUTO_INCREMENT,
+  Name varchar(50) DEFAULT NULL,
+  Eff_Strt_date varchar(50) DEFAULT NULL,
+  Eff_end_date varchar(50) DEFAULT NULL,
+  PRIMARY KEY (ID)
+ );
+ 
+ CREATE TABLE image (
+  ID int(11) NOT NULL AUTO_INCREMENT,
+  Full_Image blob DEFAULT NULL,
+  Thumbnail varchar(100) DEFAULT NULL,
+  PRIMARY KEY (ID)
+ );
+ 
+ CREATE TABLE design_style (
+  ID int(11) NOT NULLAUTO_INCREMENT,
+  Name varchar(50) DEFAULT NULL,
+  PRIMARY KEY (ID)
+ );
+ 
+ CREATE TABLE vendor (
+  ID int(11) NOT NULL AUTO_INCREMENT,
+  Name varchar(30) DEFAULT NULL,
+  priloc_id int(11) DEFAULT NULL,
+  PRIMARY KEY (ID)
+ );
+ 
+ CREATE TABLE location (
+  ID int(11) NOT NULL AUTO_INCREMENT,
+  Name varchar(30) DEFAULT NULL,
+  Phone_Number varchar(45) DEFAULT NULL,
+  Address varchar(100) DEFAULT NULL,
+  vendor_id int(11) DEFAULT NULL,
+  PRIMARY KEY (ID),
+  FOREIGN KEY (vendor_id) REFERENCES vendor (ID) ON DELETE NO ACTION ON UPDATE NO ACTION
+ );
+ 
+ ALTER TABLE vendor
+ ADD FOREIGN KEY (priloc_id) 
+ REFERENCES location (ID) 
+ ON DELETE NO ACTION ON UPDATE NO ACTION;
+ 
+ CREATE TABLE manufacturer (
+  ID int(11) NOT NULL AUTO_INCREMENT,
+  Name varchar(50) DEFAULT NULL,
+  URL varchar(100) DEFAULT NULL,
+  POC varchar(14) DEFAULT NULL,
+  image_id int(11) DEFAULT NULL,
+  PRIMARY KEY (ID),
+  FOREIGN KEY (image_id) REFERENCES image (ID) ON DELETE NO ACTION ON UPDATE NO ACTION
+ );
+ 
+ CREATE TABLE technical_attrib (
+  ID int(11) NOT NULL AUTO_INCREMENT,
+  Wattage int(11) DEFAULT NULL,
+  LED_Source varchar(50) DEFAULT NULL,
+  Beam_Angle int(11) DEFAULT NULL,
+  Color_Temperature varchar(10) DEFAULT NULL,
+  Lumen_Start varchar(10) DEFAULT NULL,
+  Lumen_End varchar(10) DEFAULT NULL,
+  IP_Rating varchar(10) DEFAULT NULL,
+  Input_Voltage varchar(10) DEFAULT NULL,
+  Output_Voltage varchar(10) DEFAULT NULL,
+  LED_mtr varchar(10) DEFAULT NULL,
+  holdertype_id int(11) DEFAULT NULL,
+  PRIMARY KEY (ID),
+  FOREIGN KEY (holdertype_id) REFERENCES holder_type (ID) ON DELETE NO ACTION ON UPDATE NO ACTION
+ );
+ 
+ CREATE TABLE physical_attrib (
+  ID int(11) NOT NULL AUTO_INCREMENT,
+  Material varchar(50) DEFAULT NULL,
+  Finish varchar(50) DEFAULT NULL,
+  Body_Color varchar(50) DEFAULT NULL,
+  Shape varchar(50) DEFAULT NULL,
+  Glass_size varchar(20) DEFAULT NULL,
+  dimension_id int(11) DEFAULT NULL,
+  PRIMARY KEY (ID),
+  FOREIGN KEY (dimension_id) REFERENCES dimension (ID) ON DELETE NO ACTION ON UPDATE NO ACTION
+ );
+ 
+ CREATE TABLE product (
+  ID int(11) NOT NULL AUTO_INCREMENT,
+  product_code varchar(25) DEFAULT NULL,
+  Name varchar(50) DEFAULT NULL,
+  designStyle_id int(11) DEFAULT NULL,
+  fixtureType_id int(11) DEFAULT NULL,
+  manufac_id int(11) DEFAULT NULL,
+  physicalAttribute_id int(11) DEFAULT NULL,
+  technicalAttribute_id int(11) DEFAULT NULL,
+  warranty_id int(11) DEFAULT NULL,
+  PRIMARY KEY (ID),
+  FOREIGN KEY (designStyle_id) REFERENCES design_style (ID) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  FOREIGN KEY (fixtureType_id) REFERENCES fixture_type (ID) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  FOREIGN KEY (manufac_id) REFERENCES manufacturer (ID) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  FOREIGN KEY (physicalAttribute_id) REFERENCES technical_attrib (ID) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  FOREIGN KEY (technicalAttribute_id) REFERENCES technical_attrib (ID) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  FOREIGN KEY (warranty_id) REFERENCES warranty (ID) ON DELETE NO ACTION ON UPDATE NO ACTION
+ );
+ 
+ CREATE TABLE collection (
+  ID int(11) NOT NULL AUTO_INCREMENT,
+  Name varchar(50) DEFAULT NULL,
+  manu_id int(11) DEFAULT NULL,	
+  PRIMARY KEY (ID),
+  FOREIGN KEY (manu_id) REFERENCES manufacturer (ID) ON DELETE NO ACTION ON UPDATE NO ACTION
+ );
+ 
+ CREATE TABLE product_images (
+  ID int(11) NOT NULL AUTO_INCREMENT,
+  produ_id int(11) DEFAULT NULL,
+  prodimg_id int(11) DEFAULT NULL,
+  PRIMARY KEY (ID),
+  FOREIGN KEY (produ_id) REFERENCES product (ID) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  FOREIGN KEY (prodimg_id) REFERENCES image (ID) ON DELETE NO ACTION ON UPDATE NO ACTION
+ );
+ 
+ CREATE TABLE product_price (
+  ID int(11) NOT NULL AUTO_INCREMENT,
+  MRP varchar(50) DEFAULT NULL,
+  Currency varchar(50) DEFAULT NULL,
+  produ_id int(11) DEFAULT NULL,
+  pricebook_id int(11) DEFAULT NULL,
+  PRIMARY KEY (ID),
+  FOREIGN KEY (produ_id) REFERENCES product (ID) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  FOREIGN KEY (pricebook_id) REFERENCES pricebook (ID) ON DELETE NO ACTION ON UPDATE NO ACTION
+ );	
+
+ CREATE TABLE product_collection (
+  ID int(11) NOT NULL AUTO_INCREMENT,
+  produ_id int(11) DEFAULT NULL,
+  coll_id int(11) DEFAULT NULL,
+  PRIMARY KEY (ID),
+  FOREIGN KEY (coll_id) REFERENCES collection (ID) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  FOREIGN KEY (produ_id) REFERENCES product (ID) ON DELETE NO ACTION ON UPDATE NO ACTION
+ );
+ 
+ CREATE TABLE product_stock (
+  ID int(11) NOT NULL AUTO_INCREMENT,
+  quantity int(11) DEFAULT NULL,
+  location_id int(11) DEFAULT NULL,
+  product_id int(11) DEFAULT NULL,
+  PRIMARY KEY (ID),
+  FOREIGN KEY (location_id) REFERENCES location (ID) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  FOREIGN KEY (product_id) REFERENCES product (ID) ON DELETE NO ACTION ON UPDATE NO ACTION
+ );
+ 
+-----------------------------------------------------------------------------------------------------------------------------------------------
+ ALTER TABLE dimension MODIFY Width varchar(30) NULL;
+ ALTER TABLE Customer CHANGE Address Addr char(50);
+ 
+ UPDATE Customers
+SET ContactName = 'Alfred Schmidt', City= 'Frankfurt'
+WHERE CustomerID = 1;
+-----------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+	mysql> LOAD DATA LOCAL INFILE 'C:/Users/Harishankar/Downloads/wc-product-export-
+18-12-2019-1576649717822.csv'INTO TABLE dimension
+    -> FIELDS TERMINATED BY ',' ENCLOSED BY '"' ESCAPED BY '"'
+    -> LINES TERMINATED BY '\r\n'
+    -> (@col,@col2,@col3,@col4,@col5,@col6,@col7,@col8,@col9,@col10,@col11,@col1
+2,@col13,@col14,@col15,@col16,@col17,@col18)
+	-> IGNORE 1 LINES
+    -> set ID=@col1,Width=@col11,Cut_Out=@col15;
+ 
+ 
+ 
+ 
+ 
+ 
